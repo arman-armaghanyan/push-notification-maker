@@ -41,26 +41,49 @@ function App() {
   const mockupCanvasRef = useRef(null);
   const mockupCanvasSquareRef = useRef(null);
 
-  // Load icons from folder
+  // Load icons from static JSON file (production) or API (development)
   const loadIconsFromFolder = async () => {
     setIsLoadingIcons(true);
     try {
-      // Add cache busting parameter to ensure fresh data
-      const response = await fetch(`/api/icons?t=${Date.now()}`);
-      const data = await response.json();
+      // Try to load from static JSON file first (works in production)
+      const response = await fetch(`/icons-data.json?t=${Date.now()}`);
       
-      if (data.icons && data.icons.length > 0) {
-        setAllShapes(data.icons);
-        setIconSource('folder');
-        // Successfully loaded icons from folder
-      } else {
-        // No icons found in the public/icons folder
-        // Fall back to built-in icons
-        setAllShapes(sampleSvgShapes);
-        setIconSource('builtin');
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.icons && data.icons.length > 0) {
+          setAllShapes(data.icons);
+          setIconSource('folder');
+          console.log(`✅ Loaded ${data.icons.length} icons from static JSON`);
+          return;
+        }
       }
+      
+      // Fallback: try the API endpoint (development only)
+      try {
+        const apiResponse = await fetch(`/api/icons?t=${Date.now()}`);
+        if (apiResponse.ok) {
+          const apiData = await apiResponse.json();
+          
+          if (apiData.icons && apiData.icons.length > 0) {
+            setAllShapes(apiData.icons);
+            setIconSource('folder');
+            console.log(`✅ Loaded ${apiData.icons.length} icons from API`);
+            return;
+          }
+        }
+      } catch (apiError) {
+        // API not available (expected in production)
+        console.log('API endpoint not available, using built-in icons');
+      }
+      
+      // Final fallback: use built-in icons
+      setAllShapes(sampleSvgShapes);
+      setIconSource('builtin');
+      console.log('📦 Using built-in sample icons');
+      
     } catch (error) {
-      // Error loading icons - using fallback
+      console.log('Error loading icons, using built-in icons:', error);
       // Fall back to built-in icons
       setAllShapes(sampleSvgShapes);
       setIconSource('builtin');
