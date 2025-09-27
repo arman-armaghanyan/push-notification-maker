@@ -106,7 +106,8 @@ module.exports = function(app) {
           'IconAIGen.svg': ['ai enhance', 'enhance', 'ai tool'],
           'IconBackgroundRemove.svg': ['remove bg', 'bg remove', 'background removal'],
           'IconSetBackground.svg': ['set bg', 'bg set'],
-          'IconAIBackground.svg': ['ai bg', 'bg ai']
+          'IconAIBackground.svg': ['ai bg', 'bg ai'],
+          'IconFrameExpand.svg': ['ai expand', 'expand', 'ai tool']
         };
         
         if (specificAlternatives[file]) {
